@@ -7,8 +7,9 @@ const app = express();
 // 导入路由模块
 const userRouter = require('./router/user.js');
 
-// 使用 app.use() 注册路由模块
-app.use(userRouter);
+// 使用 app.use() 注册路由模块，并添加统一的访问前缀 /orange
+// 注意：原先 /user/add 的路径，加了访问前缀后需要改为 /orange/user/add
+app.use('/orange', userRouter);
 
 // 托管静态资源 public 文件夹访问路径，顺便挂载路径前缀 /public；
 app.use('/public', express.static('./public'));

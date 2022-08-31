@@ -176,10 +176,36 @@ app.listen(80, function() { console.log('server running at http://127.0.0.1')});
 
   将路由抽离为单独模块的步骤如下：
 
-     (1) 创建路由模块对应的 .js 文件
-     (2) 调用 express.Router() 函数创建路由对象
-     (3) 向路由对象上挂载具体的路由
-     (4) 使用module.exports 向外共享路由对象
-     (5) 使用 app.use() 函数注册路由模块
+(1) 创建路由模块对应的 .js 文件
+(2) 调用 express.Router() 函数创建路由对象
+(3) 向路由对象上挂载具体的路由
+(4) 使用module.exports 向外共享路由对象
+(5) 使用 app.use() 函数注册路由模块
 
+- 创建路由模块：
+```JavaScript
+// /router/user.js 文件
 
+var express = require('express');               // 1. 导入 express
+var router = express.Router();                  // 2. 创建路由对象
+
+router.get('/user/list', function (req, res) {  // 3. 挂载获取用户列表的路由
+  res.send('Get user list.')
+})
+router.post('/user/add', function (req, res) {  // 4. 挂载添加用户的路由
+  res.send('Add new user.')
+})
+
+module.exports = router;                        // 5. 向外导出路由对象
+```
+
+- 注册路由模块：
+```JavaScript
+// main.js
+
+// 1. 导入路由模块
+const userRouter = require('/router/user.js');
+
+// 2. 使用 app.use() 注册路由模块
+app.use(userRouter);
+```

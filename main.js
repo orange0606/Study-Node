@@ -4,6 +4,12 @@ const express = require('express');
 // (2).创建 Web 服务器
 const app = express();
 
+// 导入全局的路由中间件函数 
+const { mw } = require('./routerMiddleware/global.js');
+
+// 全局生效的中间件,任何请求都会先经过这个全局中间件
+app.use(mw);
+
 // 导入路由模块
 const userRouter = require('./router/user.js');
 

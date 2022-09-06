@@ -316,3 +316,146 @@ const mw = function (req, res, next) {
   next();
 }
 ```
+- 局部生效的中间件
+  不使用 app.use() 定义的中间件，叫做局部生效的中间件，实例代码如下：
+
+```JavaScript
+// 定义中间件函数 mv1
+const mv1 = function (req, res, next) {
+  console.log('这是局部中间件函数mv1')
+  next();
+}
+
+// mv1 这个中间件只在'当前路由中生效'，这种用法属于“局部生效的中间件”
+app.get('/', mv1, function (req, res) {
+  res.send('Home page');
+})
+
+// mv1 这个中间件不会影响下面这个路由
+app.get('/user', function (req, res) {res.send('User page');})
+
+```
+
+- 定义多个局部中间件
+  可以在路由中，通过如下两种等价的方式，使用多个局部中间件
+
+```JavaScript
+// 以下两种写法是完全等价的，可根据自己的喜好，选择任意一种方式进行使用
+app.get('/', mv1, mv2, (req, res) => {res.send('ooo')})
+app.get('/', [mv1, mv2], (req, res) => {res.send('ooo')})
+```
+
+- 了解中间件的5个使用注意事项
+  (1.) 一定要在路由之前注册中间件
+
+  (2.) 客户端发送过来的请求，可以连续调用多个中间件进行处理
+
+  (3.) 执行完中间件的业务待，啊之后，不要忘记调用 next() 函数
+
+  (4.) 为了防止代码逻辑混乱，调用 next() 函数后不要再写额外的代码
+
+  (5.) 连续调用多个中间件时，多个中间件之间，共享req、res 对象
+
+- 中间件的分类
+  为了方便大家理解和记忆中间件的使用 Express 官方把常见的中间件用法，分成了5大类，分别是：
+
+  (1.) 应用级别的中间件
+    通过 app.use() 或 app.get() 或 app.post(), 绑定到app 实例上的中间件，叫做应用级别的中间件，代码示例如下：
+
+    ```JavaScript
+      // 应用级别的中间件（全局中间件）
+      app.use((req, res, next) => { next() });
+
+      // 应用级别的中间件（局部中间件）
+      app.get('/', mv1, (req, res) => { res,send('orange') });
+    ```
+
+  (2.) 路由级别的中间件
+    绑定到 express.Router() 实例上的中间件，叫做路由级别的中间件，它的用法和应用级别中间件没有任何区别。只不过，应用级别中间件是绑定到 app 实例上，路由级别中间件是绑定到 router 实例上，代码示例如下：
+
+    ```JavaScript
+      var app = express();
+      var router = express.Router();
+
+      // 路由级别的中间件
+      router.use(function (req, res, next) {
+        console.log('time: ', Date.now());
+        next();
+      })
+
+      app.use('/', router);
+    ```
+
+  (3.) 错误级别的中间件
+    错误级别中间件的作用：专门用来捕获整个项目中发生的异常错误，从而防止项目崩溃的问题;
+
+    格式：错误级别中间件的 function 处理函数中，必须有4个形参，形参顺序从前到后，分别是 (err, req, res, next);
+
+    注意：错误级别的中间件，必须注册在所有路由之后！
+
+    ```JavaScript
+      app.get('/', (req, res) => {                // 1. 路由
+        throw new Error('服务器内部发生了错误！'); // 1.1 跑出一个自定义的错误
+        res,send('orange') 
+      });
+
+      app.use((err, req, res, next) => {          // 2. 错误级别的中间件
+        console.log('发生了错误：' + err.message) // 2.1 在服务器打印错误消息
+        res.send('Error!' + err.message);         // 2.2 向客户端响应错误相关的内容
+      })
+    ```
+
+  (4.) Express 内置的中间件
+    自 Express 4.16.0 版本开始， Express 内置了 3 个常用的中间件，极大的提高了 Express 项目的开发效率和体验：
+
+      1. express.static 快速托管静态资源的内置中间件。例如： HTML 文件、图片、css样式等（无兼容性）
+
+      2. express.json 解析 JSON 格式的请求体数据（有兼容性，仅在4.16.0+版本中可用）
+
+      3. express.urlencoded 解析 URL-encoded 格式的请求体数据（有兼容性，仅在4.16.0+版本中可用）
+
+      ```JavaScript
+      // 配置解析 application/json 格式数据的内置中间件
+      app.use(express.json());
+      // 配置解析 application/x-www-form-urlencoded 格式数据的内置中间件
+      app.use(express.urlencoded({ extended: false }));
+
+      // 在服务器，可以使用 req.body 这个属性，来获取接收客户端发送过来的 URL-encoded 格式和 JSON 格式的数据
+      ``` 
+
+      ```JavaScript
+        var express = require('express');               // 1. 导入 express
+        var router = express.Router();                 // 2. 创建路由对象
+
+        // 3.挂载路由
+        
+        // 此处是用于测试 express.json 的接口
+        // express.json 解析 JSON 格式的请求体数据（有兼容性，仅在4.16.0+版本中可用）
+        router.post('/post-josn', function (req, res) {
+          // 在服务器，可以使用 req.body 这个属性，来获取接收客户端发送过来的 URL-encoded 格式和 JSON 格式的数据
+          // 默认情况下，如果不配置解析表单数据的中间件，则 req.body 默认等于 undefined
+          console.log("req.body : ")
+          console.log(req.body)
+          res.send(req.body)
+        })
+
+        // 此处是用于测试 express.urlencoded 的接口
+        // express.urlencoded 解析 URL-encoded 格式的请求体数据（有兼容性，仅在4.16.0+版本中可用）
+        router.post('/post-urlencoded', function (req, res) {
+          // 在服务器，可以使用 req.body 这个属性，来获取接收客户端发送过来的 URL-encoded 格式和 JSON 格式的数据
+          // 默认情况下，如果不配置解析表单数据的中间件，则 req.body 默认等于 undefined
+          console.log("req.body : ")
+          console.log(req.body)
+          res.send(req.body)
+        })
+
+        module.exports = router;                        // 4. 向外导出路由对象
+      ```
+
+  (5.) 第三方的中间件
+    非 Express 官方内置的，而是由第三方开发出来的中间件，叫做第三方中间件。在项目中，大家可以按需下载并配置第三方中间件，从而提高项目的开发效率；
+
+    例如： 在 express@4.16.0 之前的版本中，经常使用 body-parser 这个第三方中间件，来解析请求体数据。使用步骤如下：
+      1.  运行 npm install body-parser 安装中间件
+      2. 使用 require 导入中间件
+      3. 调用 app.use() 注册并使用中间件

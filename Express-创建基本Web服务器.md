@@ -415,41 +415,42 @@ app.get('/', [mv1, mv2], (req, res) => {res.send('ooo')})
       3. express.urlencoded 解析 URL-encoded 格式的请求体数据（有兼容性，仅在4.16.0+版本中可用）
 
       ```JavaScript
+      // main.js 文件
+      
       // 配置解析 application/json 格式数据的内置中间件
       app.use(express.json());
       // 配置解析 application/x-www-form-urlencoded 格式数据的内置中间件
       app.use(express.urlencoded({ extended: false }));
 
       // 在服务器，可以使用 req.body 这个属性，来获取接收客户端发送过来的 URL-encoded 格式和 JSON 格式的数据
-      ``` 
+      
+      // router.js 文件
+      var express = require('express');               // 1. 导入 express
+      var router = express.Router();                 // 2. 创建路由对象
 
-      ```JavaScript
-        var express = require('express');               // 1. 导入 express
-        var router = express.Router();                 // 2. 创建路由对象
+      // 3.挂载路由
 
-        // 3.挂载路由
-        
-        // 此处是用于测试 express.json 的接口
-        // express.json 解析 JSON 格式的请求体数据（有兼容性，仅在4.16.0+版本中可用）
-        router.post('/post-josn', function (req, res) {
-          // 在服务器，可以使用 req.body 这个属性，来获取接收客户端发送过来的 URL-encoded 格式和 JSON 格式的数据
-          // 默认情况下，如果不配置解析表单数据的中间件，则 req.body 默认等于 undefined
-          console.log("req.body : ")
-          console.log(req.body)
-          res.send(req.body)
-        })
+      // 此处是用于测试 express.json 的接口
+      // express.json 解析 JSON 格式的请求体数据（有兼容性，仅在4.16.0+版本中可用）
+      router.post('/post-josn', function (req, res) {
+        // 在服务器，可以使用 req.body 这个属性，来获取接收客户端发送过来的 URL-encoded 格式和 JSON 格式的数据
+        // 默认情况下，如果不配置解析表单数据的中间件，则 req.body 默认等于 undefined
+        console.log("req.body : ")
+        console.log(req.body)
+        res.send(req.body)
+      })
 
-        // 此处是用于测试 express.urlencoded 的接口
-        // express.urlencoded 解析 URL-encoded 格式的请求体数据（有兼容性，仅在4.16.0+版本中可用）
-        router.post('/post-urlencoded', function (req, res) {
-          // 在服务器，可以使用 req.body 这个属性，来获取接收客户端发送过来的 URL-encoded 格式和 JSON 格式的数据
-          // 默认情况下，如果不配置解析表单数据的中间件，则 req.body 默认等于 undefined
-          console.log("req.body : ")
-          console.log(req.body)
-          res.send(req.body)
-        })
+      // 此处是用于测试 express.urlencoded 的接口
+      // express.urlencoded 解析 URL-encoded 格式的请求体数据（有兼容性，仅在4.16.0+版本中可用）
+      router.post('/post-urlencoded', function (req, res) {
+        // 在服务器，可以使用 req.body 这个属性，来获取接收客户端发送过来的 URL-encoded 格式和 JSON 格式的数据
+        // 默认情况下，如果不配置解析表单数据的中间件，则 req.body 默认等于 undefined
+        console.log("req.body : ")
+        console.log(req.body)
+        res.send(req.body)
+      })
 
-        module.exports = router;                        // 4. 向外导出路由对象
+      module.exports = router;                        // 4. 向外导出路由对象
       ```
 
   (5.) 第三方的中间件
@@ -457,5 +458,7 @@ app.get('/', [mv1, mv2], (req, res) => {res.send('ooo')})
 
     例如： 在 express@4.16.0 之前的版本中，经常使用 body-parser 这个第三方中间件，来解析请求体数据。使用步骤如下：
       1.  运行 npm install body-parser 安装中间件
-      2. 使用 require 导入中间件
-      3. 调用 app.use() 注册并使用中间件
+
+      3. 使用 require 导入中间件
+
+      5. 调用 app.use() 注册并使用中间件

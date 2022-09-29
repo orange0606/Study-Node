@@ -8,6 +8,7 @@ const app = express();
 app.use(express.json());
 // 配置解析 application/x-www-form-urlencoded 格式数据的内置中间件
 app.use(express.urlencoded({ extended: false }));
+// 在服务器，可以使用 req.body 这个属性，来获取接收客户端发送过来的 URL-encoded 格式和 JSON 格式的数据
 
 // 导入全局的路由中间件函数 
 const { mw } = require('./routerMiddleware/global.js');

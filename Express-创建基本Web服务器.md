@@ -413,7 +413,8 @@ app.get('/', [mv1, mv2], (req, res) => {res.send('ooo')})
       2. express.json 解析 JSON 格式的请求体数据（有兼容性，仅在4.16.0+版本中可用）
 
       3. express.urlencoded 解析 URL-encoded 格式的请求体数据（有兼容性，仅在4.16.0+版本中可用）
-
+      
+      ```Javascript
       // main.js 文件
       
       // 配置解析 application/json 格式数据的内置中间件
